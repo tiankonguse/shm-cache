@@ -37,7 +37,9 @@ int main() {
             return -1;
         }
         
-        strcpy(shmaddr, "Hi, I am child process!");
+        snprintf(shmaddr, SIZE, "this is parent, but will print in child !");
+        
+        printf("father end\n");
         return 0;
         
     } else if (pid > 0) {
@@ -49,9 +51,10 @@ int main() {
         }
         
         printf("%s\n", shmaddr);
+        printf("child end\n");
         shm.delShm();
     } else {
-        perror("fork error\n");
+        printf("fork error\n");
         shm.delShm();
     }
     

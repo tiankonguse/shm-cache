@@ -10,30 +10,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
+#include <stdlib.h>
 
 #include "shm.h"
-
-const int TIME_NUM = 3;
-
-typedef struct {
-    long long sec;
-    long long usec;
-} Time;
-
-int generatesKey() {
-    int key;
-    char pathname[30];
-    strcpy(pathname, "/tmp");
-    
-    key = ftok(pathname, 0x03);
-    if (key == -1) {
-        perror("ftok error");
-        return -1;
-    }
-    
-    printf("key=%d\n", key);
-    return key;
-}
+#include "comm.h"
 
 int main(int argc, char** argv) {
     
@@ -56,14 +37,13 @@ int main(int argc, char** argv) {
         printf("getAdr error. err=%s\n", shm.getLastError());
         return -1;
     }
-    
+    srand(time(NULL));
     for (int i = 0; i < TIME_NUM; i++) {
         struct timeval start;
-        sleep(1);
         gettimeofday(&start, NULL);
-        
         (p_time + i)->sec = start.tv_sec;
         (p_time + i)->usec = start.tv_usec;
+        (p_time + i)->val = rand() % 100;
     }
     
     return 0;

@@ -12,28 +12,7 @@
 #include <string.h>
 
 #include "shm.h"
-
-const int TIME_NUM = 3;
-
-typedef struct {
-    long long sec;
-    long long usec;
-} Time;
-
-int generatesKey() {
-    int key;
-    char pathname[30];
-    strcpy(pathname, "/tmp");
-    
-    key = ftok(pathname, 0x03);
-    if (key == -1) {
-        perror("ftok error");
-        return -1;
-    }
-    
-    printf("key=%d\n", key);
-    return key;
-}
+#include "comm.h"
 
 int main(int argc, char** argv) {
     sleep(1);
@@ -58,9 +37,11 @@ int main(int argc, char** argv) {
     }
     
     for (int i = 0; i < TIME_NUM; i++) {
-        printf("i=%d sec=%lld usec=%lld\n", i, (p_time + i)->sec,
-                (p_time + i)->usec);
+        printf("i=%d sec=%lld usec=%lld val=%lld\n", i, (p_time + i)->sec,
+                (p_time + i)->usec, (p_time + i)->val);
     }
+    
+    shm.delShm();
     
     return 0;
     
