@@ -17,24 +17,23 @@ namespace SHM_CACHE {
     typedef uint32_t (*FCompare)(const void *, const void *);
     typedef uint32_t (*FElinemate)(const void *pKey, const void *pNode,
             uint32_t iTimeOut);
+    typedef uint32_t (*FHash)(const void *, uint32_t);
     
     typedef struct HashInfo {
         uint32_t uBucket; //实际的bucket大小
         uint32_t uShmSize; //申请内存的总大小
         uint32_t uNodeSize; //一个节点的大小
         char pHash[0];  //代表节点内存的起始位置
-        
-        HashInfo() :
-                uBucket(0), uShmSize(0), uNodeSize(0) {
-            
-        }
-        
     } HashInfo;
     
     class Hash {
         HashInfo* shmHashInfo;
         HashInfo localHashInfo;
         const uint32_t maxBucket;
+        FCompare _fCompare;
+        FElinemate _fElinemate;
+        FHash _fHash;
+        uint32_t _inited;
     public:
         
         Hash(const uint32_t maxBucket = MAX_BUCKET);
@@ -44,7 +43,7 @@ namespace SHM_CACHE {
          * 返回一个需要申请的内存大小
          * 返回0 代表参数非法,或者节点过大
          */
-        uint32_t EvalHashSize(uint32_t uSize, const uint32_t uNodeSize);
+        int EvalHashSize(uint32_t uSize, const uint32_t uNodeSize);
 
         /*
          * 根据传入的bucket, 计算出一个合适的bucket
@@ -57,7 +56,14 @@ namespace SHM_CACHE {
          * 初始化前会比较内存是第一次使用, 还是复用
          * 第一次使用需要初始化, 复用需要检查配置是否一致
          */
-        uint32_t init(void* pHash, FCompare compare, FElinemate elinemate);
+        int init(void* pHash, FCompare fCompare, FElinemate fElinemate,
+                FHash fHash);
+
+        /*
+         * 传入key的字符串,key的hash值
+         * 返回值会付给node指针
+         */
+        int Hash::get(const void *pKey, uint32_t uHashKey, void *&pNode);
     };
 
 }
