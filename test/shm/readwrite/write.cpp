@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     int key = generatesKey();
     int size = sizeof(Time) * TIME_NUM;
     
-    Shm shm;
+    SHM_CACHE::Shm shm;
     shm.init(key, size);
     
     int iShmID = shm.getShmId(IPC_CREAT | 0666);

@@ -16,7 +16,7 @@
 
 int main() {
     
-    Shm shm;
+    SHM_CACHE::Shm shm;
     
     shm.init(IPC_PRIVATE, SIZE);
     
