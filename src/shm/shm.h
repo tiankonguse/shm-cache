@@ -46,7 +46,7 @@ namespace SHM_CACHE {
          * 
          * @return 失败时返回负数. 返回0代表查询成功, 返回1代表创建
          */
-        int getShm2(volatile void **pstShm, int iFlag);
+        int getShm2(volatile void * &pstShm, int iFlag);
 
         /*
          * @desc 根据shkey删除指定的共享内存

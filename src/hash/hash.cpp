@@ -11,13 +11,17 @@
 namespace SHM_CACHE {
     
     Hash::Hash(const uint32_t _maxBucket) :
-            shmHashInfo(NULL), maxBucket(_maxBucket) {
+            shmHashInfo(NULL) {
+        maxBucket = _maxBucket;
+        if (maxBucket <= 0) {
+            maxBucket = MAX_BUCKET;
+        }
+        
         localHashInfo.uBucket = 0;
         localHashInfo.uNodeSize = 0;
         localHashInfo.uShmSize = 0;
         _fCompare = NULL;
         _fElinemate = NULL;
-        _fHash = NULL;
         _inited = 0;
     }
     
@@ -59,8 +63,7 @@ namespace SHM_CACHE {
         return localHashInfo.uShmSize;
     }
     
-    int Hash::init(void* pHash, FCompare fCompare, FElinemate fElinemate,
-            FHash fHash) {
+    int Hash::init(void* pHash, FCompare fCompare, FElinemate fElinemate) {
         if (!pHash) {
             return -1;
         }
@@ -82,7 +85,6 @@ namespace SHM_CACHE {
         }
         _fCompare = fCompare;
         _fElinemate = fElinemate;
-        _fHash = fHash;
         
         if (shmHashInfo->uShmSize
                 != shmHashInfo->uNodeSize * shmHashInfo->uBucket
@@ -95,9 +97,22 @@ namespace SHM_CACHE {
         return 0;
     }
     
-    int Hash::get(const void *pKey, uint32_t uKeySize, void *&pNode) {
+    uint32_t Hash::hash(const char *sKey, int iSize) {
+        uint32_t dwKey = 0;
+        static const uint64_t seed = 17;
+        uint32_t uHashKey = 0;
+        for (size_t i = 0; i < iSize; i++) {
+            dwKey = dwKey * seed + sKey[i];
+        }
+        
+        uHashKey = hash(dwKey);
+        
+        return uHashKey;
+    }
+    
+    int Hash::get(const void *pKey, uint32_t uKeyLen, void *&pNode) {
         //参数简单检查
-        if (pKey == NULL || uKeySize == 0) {
+        if (pKey == NULL) {
             return -1;
         }
         
@@ -106,19 +121,50 @@ namespace SHM_CACHE {
             return -2;
         }
         
-        uint32_t uHashKey = 0;
         char *pRow = NULL;
+        uint32_t uHashKey = 0;
         
         //hash 找到对应的位置
-        uHashKey = _fHash(pKey, uKeySize) % shmHashInfo->uBucket;
+        uHashKey = hash((const char *) pKey, uKeyLen);
         
         //定位到 hash 的位置
         pRow = (char*) (shmHashInfo->pHash) + uHashKey * shmHashInfo->uNodeSize;
-        if (_fCompare(pKey, pRow) == 0) {
+        if (_fCompare(pKey, uKeyLen, pRow) == 0) {
             pNode = pRow;
             return 1;
         }
         return 0;
+    }
+    
+    int Hash::getAll(const void *pKey, uint32_t uKeyLen, void *&pNode,
+            int iTimeOut) {
+        //参数简单检查
+        if (pKey == NULL) {
+            return -1;
+        }
+        
+        //hash 必须初始化
+        if (_inited == 0) {
+            return -2;
+        }
+        
+        char *pRow = NULL;
+        uint32_t uHashKey = 0;
+        
+        //hash 找到对应的位置
+        uHashKey = hash((const char *) pKey, uKeyLen);
+        
+        //定位到 hash 的位置
+        pRow = (char*) (shmHashInfo->pHash) + uHashKey * shmHashInfo->uNodeSize;
+        if (_fElinemate(pKey, uKeyLen, pRow, iTimeOut) == 0) {
+            pNode = pRow;
+            return 1;
+        }
+        return 0;
+    }
+    
+    uint32_t Hash::hash(uint32_t uHashKey) {
+        return uHashKey % shmHashInfo->uBucket;
     }
 
 }

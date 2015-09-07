@@ -14,10 +14,9 @@
 namespace SHM_CACHE {
     
     const uint32_t MAX_BUCKET = 2048;
-    typedef uint32_t (*FCompare)(const void *, const void *);
-    typedef uint32_t (*FElinemate)(const void *pKey, const void *pNode,
-            uint32_t iTimeOut);
-    typedef uint32_t (*FHash)(const void *, uint32_t);
+    typedef uint32_t (*FCompare)(const void *, int ikeyLen, const void *);
+    typedef uint32_t (*FElinemate)(const void *pKey, int ikeyLen,
+            const void *pNode, uint32_t iTimeOut);
     
     typedef struct HashInfo {
         uint32_t uBucket; //实际的bucket大小
@@ -32,7 +31,6 @@ namespace SHM_CACHE {
         const uint32_t maxBucket;
         FCompare _fCompare;
         FElinemate _fElinemate;
-        FHash _fHash;
         uint32_t _inited;
     public:
         
@@ -46,24 +44,37 @@ namespace SHM_CACHE {
         int EvalHashSize(uint32_t uSize, const uint32_t uNodeSize);
 
         /*
+         * 传入内存起始地址, 比较函数, 淘汰函数来初始化hash
+         * 初始化前会比较内存是第一次使用, 还是复用
+         * 第一次使用需要初始化, 复用需要检查配置是否一致
+         */
+        int init(void* pHash, FCompare fCompare, FElinemate fElinemate);
+
+        /*
+         * 传入key的字符串,key的长度
+         * 返回值会付给node指针
+         */
+        int Hash::get(const void *pKey, uint32_t uKeyLen, void *&pNode);
+
+        /*
+         * 传入key的字符串,key的长度, 以及超时时间
+         * 搜索到的空节点和淘汰都会放在pNode节点中
+         */
+        int getAll(const void *pKey, uint32_t uKeyLen, void *&pNode,
+                int iTimeOut);
+
+    private:
+        
+        /*
          * 根据传入的bucket, 计算出一个合适的bucket
          * 目前算法: 找到大于等于uSize的第一个素数
          */
         void calcPrime(uint32_t uSize, uint32_t& uBucket);
 
-        /*
-         * 传入内存起始地址, 比较函数, 淘汰函数来初始化hash
-         * 初始化前会比较内存是第一次使用, 还是复用
-         * 第一次使用需要初始化, 复用需要检查配置是否一致
-         */
-        int init(void* pHash, FCompare fCompare, FElinemate fElinemate,
-                FHash fHash);
+        uint32_t hash(uint32_t uHashKey);
 
-        /*
-         * 传入key的字符串,key的hash值
-         * 返回值会付给node指针
-         */
-        int Hash::get(const void *pKey, uint32_t uHashKey, void *&pNode);
+        uint32_t hash(const char *sKey, int iSize);
+        
     };
 
 }
