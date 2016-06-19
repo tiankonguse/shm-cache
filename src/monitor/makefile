@@ -15,12 +15,14 @@ C_FLAGS += -z
 C_FLAGS += -fPIC 
 
 INC = -I../
+INC += -I$(PRJ_PATH)/include/
 LIB = -lz -lrt -lpthread 
+LIB += -L$(PRJ_PATH)/lib/ -lshm
 
 SOURCE = $(wildcard *.cpp)
 OBJS    = $(patsubst %.cpp,%.o,$(SOURCE))
 
-OUTPUT  := $(PRJ_PATH)/lib/libshm.a
+OUTPUT  := $(PRJ_PATH)/lib/libmonitor.a
 
 all: $(OUTPUT)
 

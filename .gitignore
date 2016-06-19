@@ -1,0 +1,11 @@
+_site/
+build/
+file/
+_drafts/
+.DS_Store
+*.swp
+*~
+.settings/
+.svn/
+.cproject
+.project
