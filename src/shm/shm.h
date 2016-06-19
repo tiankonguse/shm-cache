@@ -39,14 +39,14 @@ namespace SHM_CACHE {
         char* getAdr();
 
         /*
-         * @desc 根据iShmID, 查询或创建iSize大小的共享内存
+         * @desc 根据iShmID, 查询或创建iSize大小的共享内存, 最后初始化内存
          * 
          * @param pstShm 返回的共享内存指针, 失败时未定义
          * @param iFlag 标志位,常用标志位是 (0666 | IPC_CREAT)
          * 
          * @return 失败时返回负数. 返回0代表查询成功, 返回1代表创建
          */
-        int getShm2(volatile void * &pstShm, int iFlag);
+        int getShmInit(volatile void * &pstShm, int iFlag);
 
         /*
          * @desc 根据shkey删除指定的共享内存

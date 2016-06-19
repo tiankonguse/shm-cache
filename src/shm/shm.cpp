@@ -21,7 +21,7 @@ namespace SHM_CACHE {
         this->iSize = iSize;
     }
     
-    int Shm::getShm2(volatile void * &pstShm, int iFlag) {
+    int Shm::getShmInit(volatile void * &pstShm, int iFlag) {
         volatile char *sShm = NULL;
         sShm = getShm(iFlag & (~IPC_CREAT));
         if (NULL == sShm) {
