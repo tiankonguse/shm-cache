@@ -9,3 +9,6 @@ _drafts/
 .svn/
 .cproject
 .project
+./lib/*.a
+*.o
+

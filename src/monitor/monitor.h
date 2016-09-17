@@ -5,13 +5,12 @@
  > Mail: i@tiankonguse.com 
  > Created Time: 2016年06月19日 星期日 21时54分18秒
  ***********************************************************************/
- 
+
 #ifndef _MONITOR_H_
 #define _MONITOR_H_
 
 #include "shm.h"
 #include <string>
-
 
 namespace SHM_CACHE {
     
@@ -19,18 +18,18 @@ namespace SHM_CACHE {
     const int MAX_MONITOR_NODE = 21000;
     
     class Monitor {
-        typedef struct{   
+        typedef struct {
             int iUse;
             int iKey;
             int iValue;
         } MonitorNode;
-        
+
         int iErrorNo;
         int iMonitorShmSize;
         MonitorNode *pstNode;
         Shm shm;
         std::string strLastError;
-        
+
     private:
         
         /*
@@ -40,17 +39,17 @@ namespace SHM_CACHE {
          * -1 空间不足
          */
         int find(int iKey, int& iPos);
-        
+
     public:
         
         Monitor();
-        
+
         /*
          * 上报数值, 为 iKey 加上 iValue.  
          */
         int report(int iKey, int iValue);
-        
-        int getErrorNo(){
+
+        int getErrorNo() {
             return iErrorNo;
         }
         
@@ -58,8 +57,8 @@ namespace SHM_CACHE {
             return strLastError;
         }
     };
-    
-};
 
+}
+;
 
 #endif

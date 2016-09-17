@@ -24,8 +24,8 @@ namespace SHM_CACHE {
         int iShmID;
         int iKey;
         int iSize;
-        char lastError[LAST_ERROR_SIZE];
-        
+        char lastErrorBuf[LAST_ERROR_SIZE];
+
     public:
         
         Shm();
@@ -34,7 +34,6 @@ namespace SHM_CACHE {
          * 初始化key和内存大小
          */
         void init(int iKey, int iSize);
-        
 
         /*
          * @desc 基础操作: 根据iKey, 查询或创建iSize大小的共享内存
@@ -42,7 +41,6 @@ namespace SHM_CACHE {
          * @return iShmID
          */
         int getShmId(int iFlag);
-        
 
         /*
          * @desc 基础操作: 根据iShmID, 映射到进程内地址
@@ -50,9 +48,7 @@ namespace SHM_CACHE {
          * @return 映射到进程内的地址
          */
         char* getAdr();
-        
-        
-        
+
         /*
          * @desc 根据iKey, 查询或创建iSize大小的共享内存
          * 
@@ -77,13 +73,12 @@ namespace SHM_CACHE {
          */
         int getShmInit(void * &pstShm, int iFlag);
         int getShmInit(void ** ppstShm, int iFlag);
-        
+
         /*
          * 得到共享内存大小
          */
         int getShmSize();
-        
-        
+
         /*
          * @desc 根据iKey, 得到共享内存, 并检查Size大小
          *       如果 piSize 是0, 则赋值 
@@ -101,9 +96,8 @@ namespace SHM_CACHE {
          */
         int delShm();
 
-
         char* getLastError() {
-            return lastError;
+            return lastErrorBuf;
         }
     };
 
