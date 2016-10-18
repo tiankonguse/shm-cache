@@ -16,90 +16,95 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifndef likely
+#define likely(x)    __builtin_expect( (x), 1)
+#define unlikely(x)  __builtin_expect( (x), 0)
+#endif
+
 namespace SHM_CACHE {
-    
-    const int LAST_ERROR_SIZE = 128;
-    
-    class Shm {
-        int iShmID;
-        int iKey;
-        int iSize;
-        char lastErrorBuf[LAST_ERROR_SIZE];
 
-    public:
-        
-        Shm();
+const int LAST_ERROR_SIZE = 128;
 
-        /*
-         * 初始化key和内存大小
-         */
-        void init(int iKey, int iSize);
+class Shm {
+	int iShmID;
+	int iKey;
+	int iSize;
+	char lastErrorBuf[LAST_ERROR_SIZE];
 
-        /*
-         * @desc 基础操作: 根据iKey, 查询或创建iSize大小的共享内存
-         * 
-         * @return iShmID
-         */
-        int getShmId(int iFlag);
+public:
 
-        /*
-         * @desc 基础操作: 根据iShmID, 映射到进程内地址
-         * 
-         * @return 映射到进程内的地址
-         */
-        char* getAdr();
+	Shm();
 
-        /*
-         * @desc 根据iKey, 查询或创建iSize大小的共享内存
-         * 
-         * @param iFlag 标志位,常用标志位是 (0666 | IPC_CREAT)
-         * 
-         * @return 返回共享内存的指针,失败时返回 NULL
-         */
-        char* getShm(int iFlag);
+	/*
+	 * 初始化key和内存大小
+	 */
+	void init(int iKey, int iSize);
 
-        /*
-         * @desc 根据iShmID, 查询或创建iSize大小的共享内存, 第一次创建时初始化内存
-         * 
-         * @param pstShm 返回的共享内存指针, 失败时未定义
-         * @param iFlag 标志位,常用标志位是 (0666 | IPC_CREAT)
-         * 
-         * @return 失败时返回负数. 
-         *    0 已存在, 查询成功
-         *    1 创建成功
-         *   -1 共享内存不存在, flag没有 IPC_CREAT 标示位
-         *   -2 共享内存不一致或者不存在, 但是创建失败
-         *    
-         */
-        int getShmInit(void * &pstShm, int iFlag);
-        int getShmInit(void ** ppstShm, int iFlag);
+	/*
+	 * @desc 基础操作: 根据iKey, 查询或创建iSize大小的共享内存
+	 *
+	 * @return iShmID
+	 */
+	int getShmId(int iFlag);
 
-        /*
-         * 得到共享内存大小
-         */
-        int getShmSize();
+	/*
+	 * @desc 基础操作: 根据iShmID, 映射到进程内地址
+	 *
+	 * @return 映射到进程内的地址
+	 */
+	char* getAdr();
 
-        /*
-         * @desc 根据iKey, 得到共享内存, 并检查Size大小
-         *       如果 piSize 是0, 则赋值 
-         * 
-         * @return 返回共享内存的指针,失败时返回 NULL
-         */
-        char* getShmNoCreateAndCheck(int iFlag, int *piSize);
+	/*
+	 * @desc 根据iKey, 查询或创建iSize大小的共享内存
+	 *
+	 * @param iFlag 标志位,常用标志位是 (0666 | IPC_CREAT)
+	 *
+	 * @return 返回共享内存的指针,失败时返回 NULL
+	 */
+	char* getShm(int iFlag);
 
-        /*
-         * @desc 根据shkey删除指定的共享内存
-         * 
-         * @param shkey 我们分配的共享内存的唯一标识
-         * 
-         * @return 成功返回0, 失败返回非0
-         */
-        int delShm();
+	/*
+	 * @desc 根据iShmID, 查询或创建iSize大小的共享内存, 第一次创建时初始化内存
+	 *
+	 * @param pstShm 返回的共享内存指针, 失败时未定义
+	 * @param iFlag 标志位,常用标志位是 (0666 | IPC_CREAT)
+	 *
+	 * @return 失败时返回负数.
+	 *    0 已存在, 查询成功
+	 *    1 创建成功
+	 *   -1 共享内存不存在, flag没有 IPC_CREAT 标示位
+	 *   -2 共享内存不一致或者不存在, 但是创建失败
+	 *
+	 */
+	int getShmInit(void * &pstShm, int iFlag);
+	int getShmInit(void ** ppstShm, int iFlag);
 
-        char* getLastError() {
-            return lastErrorBuf;
-        }
-    };
+	/*
+	 * 得到共享内存大小
+	 */
+	int getShmSize();
+
+	/*
+	 * @desc 根据iKey, 得到共享内存, 并检查Size大小
+	 *       如果 piSize 是0, 则赋值
+	 *
+	 * @return 返回共享内存的指针,失败时返回 NULL
+	 */
+	char* getShmNoCreateAndCheck(int iFlag, int *piSize);
+
+	/*
+	 * @desc 根据shkey删除指定的共享内存
+	 *
+	 * @param shkey 我们分配的共享内存的唯一标识
+	 *
+	 * @return 成功返回0, 失败返回非0
+	 */
+	int delShm();
+
+	char* getLastError() {
+		return lastErrorBuf;
+	}
+};
 
 }
 #endif

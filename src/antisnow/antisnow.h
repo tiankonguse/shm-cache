@@ -19,11 +19,11 @@ namespace SHM_CACHE {
     class AntiSnow {
         typedef struct AntiSnowNode {
             unsigned int iNum;
-            unsigned int iMax;
+            unsigned int iLock;
             unsigned int iTime;
             AntiSnowNode() {
                 iNum = 0;
-                iMax = 0;
+                iLock = 0;
                 iTime = 0;
             }
         } AntiSnowNode;
